@@ -1,7 +1,5 @@
 package org.osgi.cdi.api.extension;
 
-import javax.inject.Provider;
-
 /**
  * <p>This interface represents a service registry where all OSGi services may be handled.</p> <p>It allows to:<ul>
  *     <li>
@@ -47,12 +45,4 @@ public interface ServiceRegistry {
      */
     <T> Service<T> getServiceReferences(Class<T> contract);
 
-    /**
-     * Get an instance provider for a specified type.
-     *
-     * @param unmanagedType the interface type of the requested instance producer.
-     * @param <T>           the requested type.
-     * @return a instance {@link Provider} for the specified type.
-     */
-    <T> Provider<T> newTypeInstance(Class<T> unmanagedType);
 }

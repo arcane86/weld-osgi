@@ -1,17 +1,15 @@
 package org.osgi.cdi.impl.extension.services;
 
-import org.osgi.cdi.impl.extension.CDIOSGiExtension;
 import org.osgi.cdi.api.extension.BundleState;
 import org.osgi.cdi.api.extension.Registration;
 import org.osgi.cdi.api.extension.Service;
 import org.osgi.cdi.api.extension.ServiceRegistry;
 import org.osgi.cdi.api.extension.events.AbstractServiceEvent;
-import org.osgi.cdi.api.extension.events.BundleContainerInitialized;
+import org.osgi.cdi.api.extension.events.BundleContainerEvents;
 import org.osgi.cdi.api.extension.events.Invalid;
-import org.osgi.cdi.api.extension.events.ServiceArrival;
-import org.osgi.cdi.api.extension.events.ServiceChanged;
-import org.osgi.cdi.api.extension.events.ServiceDeparture;
+import org.osgi.cdi.api.extension.events.ServiceEvents;
 import org.osgi.cdi.api.extension.events.Valid;
+import org.osgi.cdi.impl.extension.CDIOSGiExtension;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
@@ -111,28 +109,20 @@ public class ServiceRegistryImpl implements ServiceRegistry {
         }
     }
 
-    @Override
-    public <T> Provider<T> newTypeInstance(Class<T> unmanagedType) {
-        if (!types.containsKey(unmanagedType)) {
-            types.put(unmanagedType, new Beantype<T>(unmanagedType, manager));
-        }
-        return (Provider<T>) types.get(unmanagedType);
-    }
-
-    public void listenStartup(@Observes BundleContainerInitialized event) {
+    public void listenStartup(@Observes BundleContainerEvents.BundleContainerInitialized event) {
         osgiServiceDependencies = extension.getRequiredOsgiServiceDependencies();
         checkForValidDependencies(null);
     }
 
-    public void bind(@Observes ServiceArrival arrival) {
+    public void bind(@Observes ServiceEvents.ServiceArrival arrival) {
         checkForValidDependencies(arrival);
     }
 
-    public void changed(@Observes ServiceChanged changed) {
+    public void changed(@Observes ServiceEvents.ServiceChanged changed) {
         checkForValidDependencies(changed);
     }
 
-    public void unbind(@Observes ServiceDeparture departure) {
+    public void unbind(@Observes ServiceEvents.ServiceDeparture departure) {
         checkForValidDependencies(departure);
     }
 

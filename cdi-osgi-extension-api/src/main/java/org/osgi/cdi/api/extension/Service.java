@@ -2,6 +2,7 @@ package org.osgi.cdi.api.extension;
 
 import javax.enterprise.inject.Instance;
 import javax.enterprise.util.TypeLiteral;
+import javax.inject.Provider;
 import java.lang.annotation.Annotation;
 
 /**

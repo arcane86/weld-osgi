@@ -7,7 +7,8 @@ import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
-import org.osgi.cdi.api.extension.events.BundleContainerInitialized;
+
+import org.osgi.cdi.api.extension.events.BundleContainerEvents;
 import org.osgi.cdi.api.extension.events.Invalid;
 import org.osgi.cdi.api.extension.events.Valid;
 import org.osgi.util.tracker.ServiceTracker;
@@ -22,7 +23,7 @@ public class App {
     private ServiceTracker tracker;
     private AtomicBoolean valid = new AtomicBoolean(false);
 
-    public void start(@Observes BundleContainerInitialized init) throws Exception {
+    public void start(@Observes BundleContainerEvents.BundleContainerInitialized init) throws Exception {
         this.tracker = new HttpServiceTracker(init.getBundleContext(), 
                 getClass().getClassLoader(), instances, CONTEXT_ROOT);
         this.tracker.open();

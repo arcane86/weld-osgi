@@ -8,9 +8,7 @@ import org.osgi.cdi.api.extension.annotation.Specification;
 import org.osgi.cdi.api.extension.events.AbstractBundleEvent;
 import org.osgi.cdi.api.extension.events.AbstractServiceEvent;
 import org.osgi.cdi.api.extension.events.BundleEvents;
-import org.osgi.cdi.api.extension.events.ServiceArrival;
-import org.osgi.cdi.api.extension.events.ServiceChanged;
-import org.osgi.cdi.api.extension.events.ServiceDeparture;
+import org.osgi.cdi.api.extension.events.ServiceEvents;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -142,15 +140,15 @@ public class ExtensionActivator implements BundleActivator,
                 switch (event.getType()) {
                     case ServiceEvent.MODIFIED:
                         serviceEvent =
-                            new ServiceChanged(ref, context);
+                            new ServiceEvents.ServiceChanged(ref, context);
                         break;
                     case ServiceEvent.REGISTERED:
                         serviceEvent =
-                            new ServiceArrival(ref, context);
+                            new ServiceEvents.ServiceArrival(ref, context);
                         break;
                     case ServiceEvent.UNREGISTERING:
                         serviceEvent =
-                            new ServiceDeparture(ref, context);
+                            new ServiceEvents.ServiceDeparture(ref, context);
                         break;
                 }
                 if (serviceEvent != null) {

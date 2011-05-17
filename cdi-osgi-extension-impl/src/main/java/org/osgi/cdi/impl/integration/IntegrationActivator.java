@@ -1,11 +1,10 @@
 package org.osgi.cdi.impl.integration;
 
+import org.osgi.cdi.api.extension.events.BundleContainerEvents;
 import org.osgi.cdi.impl.extension.CDIOSGiExtension;
 import org.osgi.cdi.impl.extension.services.BundleHolder;
 import org.osgi.cdi.impl.extension.services.ContainerObserver;
 import org.osgi.cdi.impl.extension.services.RegistrationsHolderImpl;
-import org.osgi.cdi.api.extension.events.BundleContainerInitialized;
-import org.osgi.cdi.api.extension.events.BundleContainerShutdown;
 import org.osgi.cdi.api.integration.CDIContainer;
 import org.osgi.cdi.api.integration.CDIContainerFactory;
 import org.osgi.cdi.api.integration.CDIContainers;
@@ -108,7 +107,7 @@ public class IntegrationActivator implements BundleActivator, BundleListener, CD
                 }
             }
             try {
-                holder.getBeanManager().fireEvent(new BundleContainerShutdown(bundle.getBundleContext()));
+                holder.getBeanManager().fireEvent(new BundleContainerEvents.BundleContainerShutdown(bundle.getBundleContext()));
                 // unregistration for managed services. It should be done by the OSGi framework
                 RegistrationsHolderImpl regsHolder = holder.getInstance().select(RegistrationsHolderImpl.class).get();
                 for (ServiceRegistration r : regsHolder.getRegistrations()) {
@@ -150,7 +149,7 @@ public class IntegrationActivator implements BundleActivator, BundleListener, CD
                 ((CDIContainerFactory) context.getService(factoryRef)).getContractBlacklist());
             // registering publishable services
             publisher.registerAndLaunchComponents();
-            holder.getBeanManager().fireEvent(new BundleContainerInitialized(bundle.getBundleContext()));
+            holder.getBeanManager().fireEvent(new BundleContainerEvents.BundleContainerInitialized(bundle.getBundleContext()));
             Collection<ServiceRegistration> regs = new ArrayList<ServiceRegistration>();
 
             BundleContext bundleContext = bundle.getBundleContext();

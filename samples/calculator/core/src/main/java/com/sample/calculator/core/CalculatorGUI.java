@@ -28,8 +28,7 @@ import javax.swing.JTextField;
 import org.osgi.cdi.api.extension.Service;
 import org.osgi.cdi.api.extension.annotation.Specification;
 import org.osgi.cdi.api.extension.events.InterBundleEvent;
-import org.osgi.cdi.api.extension.events.ServiceArrival;
-import org.osgi.cdi.api.extension.events.ServiceDeparture;
+import org.osgi.cdi.api.extension.events.ServiceEvents;
 
 @Singleton
 public class CalculatorGUI extends JFrame {
@@ -99,7 +98,7 @@ public class CalculatorGUI extends JFrame {
         this.setResizable(false);
     }
 
-    public void bindService(@Observes @Specification(Operator.class) ServiceArrival arrival) {
+    public void bindService(@Observes @Specification(Operator.class) ServiceEvents.ServiceArrival arrival) {
         Operator o = arrival.type(Operator.class).getService();
         if (!registeredOperators.containsKey(o.label())) {
             registeredOperators.put(o.label(), new OperatorListener(o));
@@ -107,7 +106,7 @@ public class CalculatorGUI extends JFrame {
         update();
     }
 
-    public void unbindService(@Observes @Specification(Operator.class) ServiceDeparture departure) {
+    public void unbindService(@Observes @Specification(Operator.class) ServiceEvents.ServiceDeparture departure) {
         Operator o = departure.type(Operator.class).getService();
         if (registeredOperators.containsKey(o.label())) {
             registeredOperators.remove(o.label());

@@ -1,21 +1,21 @@
 package com.sample.calculator.core;
 
+import org.osgi.cdi.api.extension.events.BundleContainerEvents;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
-import org.osgi.cdi.api.extension.events.BundleContainerInitialized;
-import org.osgi.cdi.api.extension.events.BundleContainerShutdown;
 
 @ApplicationScoped
 public class App {
 
     @Inject CalculatorGUI gui;
 
-    public void start(@Observes BundleContainerInitialized init) {
+    public void start(@Observes BundleContainerEvents.BundleContainerInitialized init) {
         gui.setVisible(true);
     }
 
-    public void stop(@Observes BundleContainerShutdown init) {
+    public void stop(@Observes BundleContainerEvents.BundleContainerShutdown init) {
         gui.setVisible(false);
     }
 }

@@ -1,8 +1,7 @@
 package com.sample.osgi.paint;
 
 import com.sample.osgi.paint.gui.PaintFrame;
-import org.osgi.cdi.api.extension.events.BundleContainerInitialized;
-import org.osgi.cdi.api.extension.events.BundleContainerShutdown;
+import org.osgi.cdi.api.extension.events.BundleContainerEvents;
 import org.osgi.cdi.api.extension.events.Invalid;
 import org.osgi.cdi.api.extension.events.Valid;
 
@@ -15,13 +14,13 @@ public class App {
 
     @Inject PaintFrame frame;
 
-    public void onStartup(@Observes BundleContainerInitialized event) {
+    public void onStartup(@Observes BundleContainerEvents.BundleContainerInitialized event) {
         System.out.println("CDI Container for bundle "
                 + event.getBundleContext().getBundle() + " started");
         frame.start();
     }
 
-    public void onShutdown(@Observes BundleContainerShutdown event) {
+    public void onShutdown(@Observes BundleContainerEvents.BundleContainerShutdown event) {
         frame.stop();
     }
 
