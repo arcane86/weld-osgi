@@ -1,24 +1,58 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.osgi.cdi.api.extension.events;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 
+import java.util.*;
+
 /**
- * <p>Represents all the CDI-OSGi service events as a superclass.</p> <p/> <p>Provides a way to listen all service
- * events in a single method. Allows to retrieve both original event type as a {@link BundleEventType} and the firing
- * service informations.</p>
+ * <p>This abstract class represents all the CDI-OSGi service events as a
+ * superclass.</p>
+ * <p>It allows to:<ul>
+ * <li>
+ * <p>Represent all service events,</p>
+ * </li>
+ * <li>
+ * <p>Retrieve the current event type as a
+ * {@link ServiceEventType},</p>
+ * </li>
+ * <li>
+ * <p>Retrieve the affected {@link ServiceReference}, the
+ * corresponding information and registering
+ * {@link Bundle},</p>
+ * </li>
+ * <li>
+ * <p>Manipulate the service,</p>
+ * </li>
+ * <li>
+ * <p>Retrieve the firing {@link BundleContext}.</p>
+ * </li>
+ * </ul></p>
+ * <p>It may be used in {@link javax.enterprise.event.Observes} method in order to listen all service
+ * events.</p>
  *
  * @author Mathieu ANCELIN - SERLI (mathieu.ancelin@serli.com)
  * @author Matthieu CLOCHARD - SERLI (matthieu.clochard@serli.com)
+ * @see Bundle
+ * @see BundleContext
+ * @see ServiceReference
+ * @see ServiceEvents
  * @see ServiceEventType
+ * @see javax.enterprise.event.Observes
  */
 public abstract class AbstractServiceEvent {
 

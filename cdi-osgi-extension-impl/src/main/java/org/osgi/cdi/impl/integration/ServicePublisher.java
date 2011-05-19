@@ -1,5 +1,6 @@
 package org.osgi.cdi.impl.integration;
 
+import org.osgi.cdi.api.extension.annotation.Property;
 import org.osgi.cdi.impl.extension.CDIOSGiExtension;
 import org.osgi.cdi.impl.extension.services.RegistrationsHolderImpl;
 import org.osgi.cdi.api.extension.annotation.Publish;
@@ -129,12 +130,8 @@ public class ServicePublisher {
         } else {
             if (publish.properties().length > 0) {
                 properties = new Properties();
-                for (String property : publish.properties()) {
-                    if (property.split("=").length == 2) {
-                        String key = property.split("=")[0];
-                        String value = property.split("=")[1];
-                        properties.setProperty(key, value);
-                    }
+                for (Property property : publish.properties()) {
+                    properties.setProperty(property.name(), property.value());
                 }
             }
         }
