@@ -29,8 +29,8 @@ public class WeldCDIContainerFactory implements CDIContainerFactory {
     }
 
     @Override
-    public Class<? extends CDIContainerFactory> delegateClass() {
-        return WeldCDIContainerFactory.class;
+    public CDIContainer containers() {
+        return null;
     }
 
     @Override

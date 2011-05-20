@@ -107,32 +107,29 @@ public class ServicePublisher {
 
     private static Properties getServiceProperties(Publish publish, List<Annotation> qualifiers) {
         Properties properties = null;
-        if (publish.useQualifiersAsProperties()) {
-            if (!qualifiers.isEmpty()) {
-                properties = new Properties();
-                for (Annotation qualif : qualifiers) {
-                    for (Method m : qualif.annotationType().getDeclaredMethods()) {
-                        if (!m.isAnnotationPresent(Nonbinding.class)) {
-                            try {
-                                String key = qualif.annotationType().getName() + "." + m.getName();
-                                Object value = m.invoke(qualif);
-                                if (value == null) {
-                                    value = m.getDefaultValue();
-                                }
-                                properties.setProperty(key, value.toString());
-                            } catch (Throwable t) {
-                                // ignore
+        if (!qualifiers.isEmpty()) {
+            properties = new Properties();
+            for (Annotation qualif : qualifiers) {
+                for (Method m : qualif.annotationType().getDeclaredMethods()) {
+                    if (!m.isAnnotationPresent(Nonbinding.class)) {
+                        try {
+                            String key = qualif.annotationType().getName() + "." + m.getName();
+                            Object value = m.invoke(qualif);
+                            if (value == null) {
+                                value = m.getDefaultValue();
                             }
+                            properties.setProperty(key, value.toString());
+                        } catch (Throwable t) {
+                            // ignore
                         }
                     }
                 }
             }
-        } else {
-            if (publish.properties().length > 0) {
-                properties = new Properties();
-                for (Property property : publish.properties()) {
-                    properties.setProperty(property.name(), property.value());
-                }
+        }
+        if (publish.properties().length > 0) {
+            properties = new Properties();
+            for (Property property : publish.properties()) {
+                properties.setProperty(property.name(), property.value());
             }
         }
         return properties;

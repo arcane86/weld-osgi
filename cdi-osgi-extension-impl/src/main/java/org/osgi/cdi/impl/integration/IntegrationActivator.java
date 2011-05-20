@@ -7,7 +7,6 @@ import org.osgi.cdi.impl.extension.services.ContainerObserver;
 import org.osgi.cdi.impl.extension.services.RegistrationsHolderImpl;
 import org.osgi.cdi.api.integration.CDIContainer;
 import org.osgi.cdi.api.integration.CDIContainerFactory;
-import org.osgi.cdi.api.integration.CDIContainers;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -33,7 +32,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author Guillaume Sauthier
  * @author Mathieu ANCELIN - SERLI (mathieu.ancelin@serli.com)
  */
-public class IntegrationActivator implements BundleActivator, BundleListener, CDIContainers, ServiceListener {
+public class IntegrationActivator implements BundleActivator, BundleListener, ServiceListener, Iterable<CDIContainer> {
 
     private Map<Long, CDIContainer> managed;
     private ServiceReference factoryRef = null;

@@ -12,6 +12,7 @@ import javax.enterprise.event.Event;
 import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.spi.BeanManager;
 import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * @author Mathieu ANCELIN - SERLI (mathieu.ancelin@serli.com)
@@ -30,6 +31,21 @@ public class WeldCDIContainer implements CDIContainer {
     @Override
     public void setRegistrations(Collection<ServiceRegistration> registrations) {
         this.registrations = registrations;
+    }
+
+    @Override
+    public CDIContainer select(Bundle bundle) {
+        return null;
+    }
+
+    @Override
+    public CDIContainer select(String name, String version) {
+        return null;
+    }
+
+    @Override
+    public int size() {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
@@ -89,5 +105,10 @@ public class WeldCDIContainer implements CDIContainer {
     @Override
     public Collection<String> getBeanClasses() {
         return container.getBeanClasses();
+    }
+
+    @Override
+    public Iterator<CDIContainer> iterator() {
+        return null;
     }
 }
