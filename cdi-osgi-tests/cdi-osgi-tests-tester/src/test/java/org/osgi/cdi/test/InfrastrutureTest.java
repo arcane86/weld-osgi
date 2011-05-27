@@ -9,17 +9,15 @@ import org.ops4j.pax.exam.junit.JUnit4TestRunner;
 import org.osgi.cdi.api.integration.CDIContainer;
 import org.osgi.cdi.api.integration.CDIContainerFactory;
 import org.osgi.cdi.test.util.Environment;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleException;
-import org.osgi.framework.ServiceReference;
+import org.osgi.framework.*;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import static org.ops4j.pax.exam.CoreOptions.options;
 
 @RunWith(JUnit4TestRunner.class)
-public class CDIOSGiTest {
+public class InfrastrutureTest {
 
     @Configuration
     public static Option[] configure() {
@@ -28,7 +26,7 @@ public class CDIOSGiTest {
         );
     }
 
-    @Test
+//    @Test
     public void launchTest(BundleContext context) throws InterruptedException, BundleException {
         Environment.waitForEnvironment(context);
 
@@ -65,7 +63,7 @@ public class CDIOSGiTest {
 
     }
 
-    @Test
+//    @Test
     public void CDIContainerFactoryTest(BundleContext context) throws InterruptedException {
         Environment.waitForEnvironment(context);
 
@@ -98,5 +96,45 @@ public class CDIOSGiTest {
         Assert.assertEquals("There still containers in the container collection",0,i);
 
     }
+
+    @Test
+    public void CDIContainerTest(BundleContext context) throws InterruptedException, InvalidSyntaxException {
+        Environment.waitForEnvironment(context);
+
+        ServiceReference factoryReference = context.getServiceReference(CDIContainerFactory.class.getName());
+        CDIContainerFactory factory = (CDIContainerFactory) context.getService(factoryReference);
+        Collection<CDIContainer> containers = factory.containers();
+        CDIContainer container = factory.createContainer(context.getBundle());
+
+        Assert.assertEquals("The container had the wrong bundle", context.getBundle(), container.getBundle());
+        Assert.assertFalse("The container was declared as STARTED",container.isStarted());
+        Assert.assertNotNull("The registration collection was null",container.getRegistrations());
+        Assert.assertEquals("The registration collection was not empty",0,container.getRegistrations().size());
+
+        Collection<ServiceRegistration> registrations = new ArrayList<ServiceRegistration>();
+        container.setRegistrations(registrations);
+        Assert.assertNotNull("The registration collection was null",container.getRegistrations());
+        Assert.assertEquals("The registration collection was not empty",0,container.getRegistrations().size());
+
+        ServiceRegistration registration = context.registerService(String.class.getName(),"STRING",null);
+        registrations.add(registration);
+        container.setRegistrations(registrations);
+        Assert.assertNotNull("The registration collection was null",container.getRegistrations());
+        Assert.assertEquals("The registration collection had the wrong number of registration",1,container.getRegistrations().size());
+
+        registration = context.registerService(String.class.getName(),"STRING2",null);
+        registrations.add(registration);
+        container.setRegistrations(registrations);
+        Assert.assertNotNull("The registration collection was null",container.getRegistrations());
+        Assert.assertEquals("The registration collection had the wrong number of registration",2,container.getRegistrations().size());
+
+        registrations.clear();
+        container.setRegistrations(registrations);
+        Assert.assertNotNull("The registration collection was null",container.getRegistrations());
+        Assert.assertEquals("The registration collection was not empty",0,container.getRegistrations().size());
+        
+    }
+
+
 
 }

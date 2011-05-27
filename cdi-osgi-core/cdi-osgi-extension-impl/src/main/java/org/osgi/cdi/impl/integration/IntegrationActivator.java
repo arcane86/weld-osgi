@@ -117,7 +117,6 @@ public class IntegrationActivator implements BundleActivator, BundleListener, Se
     private void startManagement(Bundle bundle) {
         boolean set = CDIOSGiExtension.currentBundle.get() != null;
         CDIOSGiExtension.currentBundle.set(bundle.getBundleId());
-        //System.out.println("Starting management for bundle " + bundle);
         CDIContainer holder = factory().createContainer(bundle);
         holder.initialize();
         if (holder.isStarted()) {

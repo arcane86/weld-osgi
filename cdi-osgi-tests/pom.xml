@@ -18,6 +18,7 @@
 
     <modules>
         <module>cdi-osgi-tests-tester</module>
+        <module>cdi-osgi-tests-bundle1</module>
     </modules>
     
 </project>
