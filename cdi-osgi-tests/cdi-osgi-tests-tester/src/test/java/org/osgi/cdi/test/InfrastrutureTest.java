@@ -26,7 +26,7 @@ public class InfrastrutureTest {
         );
     }
 
-//    @Test
+    @Test
     public void launchTest(BundleContext context) throws InterruptedException, BundleException {
         Environment.waitForEnvironment(context);
 
@@ -63,7 +63,7 @@ public class InfrastrutureTest {
 
     }
 
-//    @Test
+    @Test
     public void CDIContainerFactoryTest(BundleContext context) throws InterruptedException {
         Environment.waitForEnvironment(context);
 
@@ -134,7 +134,4 @@ public class InfrastrutureTest {
         Assert.assertEquals("The registration collection was not empty",0,container.getRegistrations().size());
         
     }
-
-
-
 }

@@ -11,6 +11,7 @@ import org.osgi.cdi.api.integration.CDIContainerFactory;
 import org.osgi.cdi.test.util.Environment;
 import org.osgi.framework.*;
 
+import javax.enterprise.event.Event;
 import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.spi.BeanManager;
 import java.util.Collection;
@@ -29,7 +30,7 @@ public class UsageTest {
     }
 
     @Test
-    public void launchTest(BundleContext context) throws InterruptedException, BundleException {
+    public void launchTest(BundleContext context) throws InterruptedException, BundleException, InvalidSyntaxException {
         Environment.waitForEnvironment(context);
 
         Bundle bundle1 = null;
@@ -60,13 +61,25 @@ public class UsageTest {
         Assert.assertNotNull("The bean class collection was null",beanClasses);
 
         BeanManager beanManager = container.getBeanManager();
+        ServiceReference[] beanManagerServices = context.getServiceReferences(BeanManager.class.getName(),null);
+        BeanManager beanManagerService = (BeanManager)context.getService(beanManagerServices[0]);
+        Assert.assertEquals("The number of bean manager services was wrong",1,beanManagerServices.length);
         Assert.assertNotNull("The bean manager was null",beanManager);
+        Assert.assertEquals("The bean manager service did not match the bean manager",beanManager,beanManagerService);
 
-//        Event event = container.getEvent();
-//        Assert.assertNotNull("The event was null",event);
+        Event event = container.getEvent();
+        ServiceReference[] eventServices = context.getServiceReferences(Event.class.getName(),null);
+        Event eventService = (Event)context.getService(eventServices[0]);
+        Assert.assertEquals("The number of event services was wrong",1,eventServices.length);
+        Assert.assertNotNull("The event was null",event);
+//        Assert.assertEquals("The event service did not match the event",event,eventService);
 
         Instance instance = container.getInstance();
+        ServiceReference[] instanceServices = context.getServiceReferences(Instance.class.getName(),null);
+        Instance instanceService = (Instance)context.getService(instanceServices[0]);
+        Assert.assertEquals("The number of instance services was wrong",1,instanceServices.length);
         Assert.assertNotNull("The instance was null",instance);
+        Assert.assertEquals("The instance service did not match the instance",instance,instanceService);
 
         Assert.assertTrue("The container was not been shutdown",container.shutdown());
         Assert.assertFalse("The container was still started",container.isStarted());
