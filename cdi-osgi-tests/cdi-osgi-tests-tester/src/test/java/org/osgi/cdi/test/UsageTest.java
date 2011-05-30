@@ -27,7 +27,8 @@ public class UsageTest {
         return options(
                 Environment.CDIOSGiEnvironment(
                         mavenBundle("com.sample.osgi","cdi-osgi-tests-bundle1").version("1.0-SNAPSHOT"),
-                        mavenBundle("com.sample.osgi","cdi-osgi-tests-bundle2").version("1.0-SNAPSHOT")
+                        mavenBundle("com.sample.osgi","cdi-osgi-tests-bundle2").version("1.0-SNAPSHOT"),
+                        mavenBundle("com.sample.osgi","cdi-osgi-tests-bundle3").version("1.0-SNAPSHOT")
                 )
         );
     }
@@ -36,7 +37,7 @@ public class UsageTest {
     public void launchTest(BundleContext context) throws InterruptedException, BundleException, InvalidSyntaxException {
         Environment.waitForEnvironment(context);
 
-        Bundle bundle1 = null, bundle2 = null;
+        Bundle bundle1 = null, bundle2 = null, bundle3 = null;
 
         for(Bundle b : context.getBundles()) {
             Assert.assertEquals("Bundle" + b.getSymbolicName() + "is not ACTIVE", Bundle.ACTIVE, b.getState());
@@ -46,10 +47,14 @@ public class UsageTest {
             if(b.getSymbolicName().equals("com.sample.osgi.cdi-osgi-tests-bundle2")) {
                 bundle2=b;
             }
+            if(b.getSymbolicName().equals("com.sample.osgi.cdi-osgi-tests-bundle3")) {
+                bundle3=b;
+            }
         }
 
         Assert.assertNotNull("The bundle1 was not retrieved",bundle1);
         Assert.assertNotNull("The bundle2 was not retrieved",bundle2);
+        Assert.assertNotNull("The bundle3 was not retrieved",bundle3);
 
         ServiceReference factoryReference = context.getServiceReference(CDIContainerFactory.class.getName());
         CDIContainerFactory factory = (CDIContainerFactory) context.getService(factoryReference);
@@ -59,8 +64,10 @@ public class UsageTest {
 
         CDIContainer container1 = factory.container(bundle1);
         CDIContainer container2 = factory.container(bundle2);
+        CDIContainer container3 = factory.container(bundle3);
         Assert.assertNotNull("The container for bundle1 was null",container1);
         Assert.assertNotNull("The container for bundle2 was null",container2);
+        Assert.assertNull("The container for bundle3 was not null",container3);
         Assert.assertTrue("The container for bundle1 was not started",container1.isStarted());
         Assert.assertTrue("The container for bundle2 was not started",container2.isStarted());
 
