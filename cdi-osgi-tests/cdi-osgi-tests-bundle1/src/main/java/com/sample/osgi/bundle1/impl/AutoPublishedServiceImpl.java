@@ -1,16 +1,15 @@
 package com.sample.osgi.bundle1.impl;
 
-import com.sample.osgi.bundle1.api.MyService;
+import com.sample.osgi.bundle1.api.AutoPublishedService;
 import org.osgi.cdi.api.extension.annotation.Publish;
 
 import javax.enterprise.context.ApplicationScoped;
 
 @Publish
 @ApplicationScoped
-public class MyServiceImpl implements MyService {
-
+public class AutoPublishedServiceImpl implements AutoPublishedService {
     @Override
-    public String doThat(String action) {
-        return action;
+    public String whoAmI() {
+        return getClass().getName();
     }
 }

@@ -1,5 +1,6 @@
 package org.osgi.cdi.test;
 
+import com.sample.osgi.bundle1.api.AutoPublishedService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -67,7 +68,7 @@ public class UsageTest {
         CDIContainer container3 = factory.container(bundle3);
         Assert.assertNotNull("The container for bundle1 was null",container1);
         Assert.assertNotNull("The container for bundle2 was null",container2);
-        Assert.assertNull("The container for bundle3 was not null",container3);
+        Assert.assertNull("The container for bundle3 was not null", container3);
         Assert.assertTrue("The container for bundle1 was not started",container1.isStarted());
         Assert.assertTrue("The container for bundle2 was not started",container2.isStarted());
 
@@ -84,69 +85,70 @@ public class UsageTest {
         BeanManager beanManager1 = container1.getBeanManager();
         BeanManager beanManager2 = container2.getBeanManager();
         ServiceReference[] beanManagerServices = context.getServiceReferences(BeanManager.class.getName(),null);
-        BeanManager beanManagerService1 = null;
-        BeanManager beanManagerService2 = null;
-        for(ServiceReference ref : beanManagerServices) {
-            if(ref.getBundle() == bundle1) {
-                beanManagerService1 = (BeanManager)context.getService(ref);
-            }
-            if(ref.getBundle() == bundle2) {
-                beanManagerService2 = (BeanManager)context.getService(ref);
-            }
-        }
+        Assert.assertNotNull("The event bean manager reference array was null",beanManagerServices);
         Assert.assertEquals("The number of bean manager services was wrong",2,beanManagerServices.length);
         Assert.assertNotNull("The bean manager 1 was null",beanManager1);
         Assert.assertNotNull("The bean manager 2 was null",beanManager2);
-        Assert.assertNotNull("The bean manager service 1 was null",beanManagerService1);
-        Assert.assertNotNull("The bean manager service 2 was null",beanManagerService2);
-        Assert.assertEquals("The bean manager service 1 did not match the bean manager 1",beanManager1,beanManagerService1);
-        Assert.assertEquals("The bean manager service 2 did not match the bean manager 2",beanManager2,beanManagerService2);
 
         Event event1 = container1.getEvent();
         Event event2 = container2.getEvent();
         ServiceReference[] eventServices = context.getServiceReferences(Event.class.getName(),null);
-        Event eventService1 = null;
-        Event eventService2 = null;
-        for(ServiceReference ref : eventServices) {
-            if(ref.getBundle() == bundle1) {
-                eventService1 = (Event)context.getService(ref);
-            }
-            if(ref.getBundle() == bundle2) {
-                eventService2 = (Event)context.getService(ref);
-            }
-        }
+        Assert.assertNotNull("The event service reference array was null",eventServices);
         Assert.assertEquals("The number of event services was wrong",2,eventServices.length);
         Assert.assertNotNull("The event 1 was null",event1);
         Assert.assertNotNull("The event 2 was null",event2);
-        Assert.assertNotNull("The event service 1 was null",eventService1);
-        Assert.assertNotNull("The event service 2 was null",eventService2);
-//        Assert.assertEquals("The event service 1 did not match the event 1",event1,eventService1);
-//        Assert.assertEquals("The event service 2 did not match the event 2",event2,eventService2);
 
         Instance instance1 = container1.getInstance();
         Instance instance2 = container2.getInstance();
         ServiceReference[] instanceServices = context.getServiceReferences(Instance.class.getName(),null);
-        Instance instanceService1 = null;
-        Instance instanceService2 = null;
-        for(ServiceReference ref : instanceServices) {
-            if(ref.getBundle() == bundle1) {
-                instanceService1 = (Instance)context.getService(ref);
-            }
-            if(ref.getBundle() == bundle2) {
-                instanceService2 = (Instance)context.getService(ref);
-            }
-        }
+        Assert.assertNotNull("The instance service reference array was null",instanceServices);
         Assert.assertEquals("The number of instance services was wrong",2,instanceServices.length);
         Assert.assertNotNull("The instance 1 was null",instance1);
         Assert.assertNotNull("The instance 2 was null",instance2);
-        Assert.assertNotNull("The instance 1 service was null",instanceService1);
-        Assert.assertNotNull("The instance 2 service was null",instanceService2);
-        Assert.assertEquals("The instance service 1 did not match the instance 1",instance1,instanceService1);
-        Assert.assertEquals("The instance service 2 did not match the instance 2",instance2,instanceService2);
 
         Assert.assertTrue("The container was not been shutdown",container1.shutdown());
         Assert.assertFalse("The container was still started",container1.isStarted());
         Assert.assertEquals("The container collection had the wrong number of containers",2,containers.size());
+
+    }
+
+    @Test
+    public void servicesTest(BundleContext context) throws InterruptedException, InvalidSyntaxException {
+        Environment.waitForEnvironment(context);
+
+        Bundle bundle1 = null, bundle2 = null, bundle3 = null;
+
+        for(Bundle b : context.getBundles()) {
+            Assert.assertEquals("Bundle" + b.getSymbolicName() + "is not ACTIVE", Bundle.ACTIVE, b.getState());
+            if(b.getSymbolicName().equals("com.sample.osgi.cdi-osgi-tests-bundle1")) {
+                bundle1=b;
+            }
+            if(b.getSymbolicName().equals("com.sample.osgi.cdi-osgi-tests-bundle2")) {
+                bundle2=b;
+            }
+            if(b.getSymbolicName().equals("com.sample.osgi.cdi-osgi-tests-bundle3")) {
+                bundle3=b;
+            }
+        }
+
+        ServiceReference[] autoPublishedServiceReferences = context.getServiceReferences(AutoPublishedService.class.getName(),null);
+        AutoPublishedService autoPublishedService1 = null;
+        AutoPublishedService autoPublishedService2 = null;
+
+        Assert.assertNotNull("The auto published service reference array was null",autoPublishedServiceReferences);
+        Assert.assertEquals("The number of auto published service implementations was wrong",2,autoPublishedServiceReferences.length);
+        for(ServiceReference ref : autoPublishedServiceReferences) {
+            if(ref.getBundle() == bundle1) {
+                autoPublishedService1 = (AutoPublishedService)context.getService(ref);
+            }
+            if(ref.getBundle() == bundle2) {
+                autoPublishedService2 = (AutoPublishedService)context.getService(ref);
+            }
+        }
+        Assert.assertNotNull("The auto published service 1 was null",autoPublishedService1);
+        Assert.assertNotNull("The auto published service 2 was null",autoPublishedService2);
+        Assert.assertEquals("The auto published service 1 method result was wrong","com.sample.osgi.bundle1.impl.AutoPublishedServiceImpl",autoPublishedService1.whoAmI());
+        Assert.assertEquals("The auto published service 1 method result was wrong","com.sample.osgi.bundle2.impl.AutoPublishedServiceImpl",autoPublishedService2.whoAmI());
 
     }
 }
