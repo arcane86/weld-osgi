@@ -1,6 +1,7 @@
 package org.osgi.cdi.test;
 
 import com.sample.osgi.bundle1.api.AutoPublishedService;
+import com.sample.osgi.bundle1.api.RandomInterface;
 import com.sample.osgi.bundle1.api.ManualPublishedService;
 import org.junit.Assert;
 import org.junit.Test;
@@ -115,7 +116,7 @@ public class UsageTest {
     }
 
     @Test
-    public void servicePublishingTest(BundleContext context) throws InterruptedException, InvalidSyntaxException, BundleException {
+    public void serviceTest(BundleContext context) throws InterruptedException, InvalidSyntaxException, BundleException {
         Environment.waitForEnvironment(context);
 
         Bundle bundle1 = null, bundle2 = null, bundle3 = null;
@@ -179,9 +180,20 @@ public class UsageTest {
         Assert.assertEquals("The manual published service 2 method result was wrong","com.sample.osgi.bundle2.impl.ManualPublishedServiceImpl",manualPublishedService2.whoAmI());
         Assert.assertEquals("The manual published service 3 method result was wrong","com.sample.osgi.bundle3.impl.ManualPublishedServiceImpl",manualPublishedService3.whoAmI());
 
+        ServiceReference[] autoPublishedService2References = context.getServiceReferences(RandomInterface.class.getName(),null);
+        RandomInterface autoPublishedService21 = null;
+        Assert.assertNotNull("The auto published service reference array was null",autoPublishedService2References);
+        Assert.assertEquals("The number of auto published service implementations was wrong",1,autoPublishedService2References.length);
+        for(ServiceReference ref : autoPublishedService2References) {
+            if(ref.getBundle() == bundle1) {
+                autoPublishedService21 = (RandomInterface)context.getService(ref);
+            }
+        }
+        Assert.assertNotNull("The auto published service 21 was null", autoPublishedService21);
+
         ServiceReference[] blackListedServiceReferences = context.getServiceReferences(Serializable.class.getName(),null);
         Assert.assertNotNull("The black list service reference array was null",blackListedServiceReferences);
-        Assert.assertEquals("The number of unblacklisted service implementations was wrong",1,blackListedServiceReferences.length);
+        Assert.assertEquals("The number of unblacklisted service implementations was wrong", 1, blackListedServiceReferences.length);
         Serializable unblackListedService = null;
         for(ServiceReference ref : blackListedServiceReferences) {
             if(ref.getBundle() == bundle1) {
