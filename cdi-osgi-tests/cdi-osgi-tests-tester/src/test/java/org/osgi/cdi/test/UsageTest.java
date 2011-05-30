@@ -1,8 +1,9 @@
 package org.osgi.cdi.test;
 
 import com.sample.osgi.bundle1.api.AutoPublishedService;
-import com.sample.osgi.bundle1.api.RandomInterface;
+import com.sample.osgi.bundle1.api.ContractInterface;
 import com.sample.osgi.bundle1.api.ManualPublishedService;
+import com.sample.osgi.bundle1.api.NotContractInterface;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -180,16 +181,18 @@ public class UsageTest {
         Assert.assertEquals("The manual published service 2 method result was wrong","com.sample.osgi.bundle2.impl.ManualPublishedServiceImpl",manualPublishedService2.whoAmI());
         Assert.assertEquals("The manual published service 3 method result was wrong","com.sample.osgi.bundle3.impl.ManualPublishedServiceImpl",manualPublishedService3.whoAmI());
 
-        ServiceReference[] autoPublishedService2References = context.getServiceReferences(RandomInterface.class.getName(),null);
-        RandomInterface autoPublishedService21 = null;
-        Assert.assertNotNull("The auto published service reference array was null",autoPublishedService2References);
-        Assert.assertEquals("The number of auto published service implementations was wrong",1,autoPublishedService2References.length);
-        for(ServiceReference ref : autoPublishedService2References) {
+        ServiceReference[] contractPublishedServiceReferences = context.getServiceReferences(ContractInterface.class.getName(),null);
+        ContractInterface contractPublishedService = null;
+        Assert.assertNotNull("The contract published service reference array was null",contractPublishedServiceReferences);
+        Assert.assertEquals("The number of contract published service implementations was wrong", 1,contractPublishedServiceReferences.length);
+        for(ServiceReference ref : contractPublishedServiceReferences) {
             if(ref.getBundle() == bundle1) {
-                autoPublishedService21 = (RandomInterface)context.getService(ref);
+                contractPublishedService = (ContractInterface)context.getService(ref);
             }
         }
-        Assert.assertNotNull("The auto published service 21 was null", autoPublishedService21);
+        Assert.assertNotNull("The contract published service was null", contractPublishedService);
+        ServiceReference[] notNontractPublishedServiceReferences = context.getServiceReferences(NotContractInterface.class.getName(),null);
+        Assert.assertNull("The not contract published service reference array was not null",notNontractPublishedServiceReferences);
 
         ServiceReference[] blackListedServiceReferences = context.getServiceReferences(Serializable.class.getName(),null);
         Assert.assertNotNull("The black list service reference array was null",blackListedServiceReferences);
