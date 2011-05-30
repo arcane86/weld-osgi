@@ -1,6 +1,7 @@
 package org.osgi.cdi.test;
 
 import com.sample.osgi.bundle1.api.AutoPublishedService;
+import com.sample.osgi.bundle1.api.ManualPublishedService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,7 +35,7 @@ public class UsageTest {
         );
     }
 
-    @Test
+//    @Test
     public void launchTest(BundleContext context) throws InterruptedException, BundleException, InvalidSyntaxException {
         Environment.waitForEnvironment(context);
 
@@ -86,9 +87,9 @@ public class UsageTest {
         BeanManager beanManager2 = container2.getBeanManager();
         ServiceReference[] beanManagerServices = context.getServiceReferences(BeanManager.class.getName(),null);
         Assert.assertNotNull("The event bean manager reference array was null",beanManagerServices);
-        Assert.assertEquals("The number of bean manager services was wrong",2,beanManagerServices.length);
-        Assert.assertNotNull("The bean manager 1 was null",beanManager1);
-        Assert.assertNotNull("The bean manager 2 was null",beanManager2);
+        Assert.assertEquals("The number of bean manager services was wrong", 2, beanManagerServices.length);
+        Assert.assertNotNull("The bean manager 1 was null", beanManager1);
+        Assert.assertNotNull("The bean manager 2 was null", beanManager2);
 
         Event event1 = container1.getEvent();
         Event event2 = container2.getEvent();
@@ -113,13 +114,14 @@ public class UsageTest {
     }
 
     @Test
-    public void servicesTest(BundleContext context) throws InterruptedException, InvalidSyntaxException {
+    public void servicePublishingTest(BundleContext context) throws InterruptedException, InvalidSyntaxException, BundleException {
         Environment.waitForEnvironment(context);
 
         Bundle bundle1 = null, bundle2 = null, bundle3 = null;
 
         for(Bundle b : context.getBundles()) {
-            Assert.assertEquals("Bundle" + b.getSymbolicName() + "is not ACTIVE", Bundle.ACTIVE, b.getState());
+            b.start();
+            Assert.assertEquals("Bundle " + b.getSymbolicName() + " is not ACTIVE but " + Environment.state(b.getState()), Bundle.ACTIVE, b.getState());
             if(b.getSymbolicName().equals("com.sample.osgi.cdi-osgi-tests-bundle1")) {
                 bundle1=b;
             }
@@ -134,7 +136,6 @@ public class UsageTest {
         ServiceReference[] autoPublishedServiceReferences = context.getServiceReferences(AutoPublishedService.class.getName(),null);
         AutoPublishedService autoPublishedService1 = null;
         AutoPublishedService autoPublishedService2 = null;
-
         Assert.assertNotNull("The auto published service reference array was null",autoPublishedServiceReferences);
         Assert.assertEquals("The number of auto published service implementations was wrong",2,autoPublishedServiceReferences.length);
         for(ServiceReference ref : autoPublishedServiceReferences) {
@@ -148,7 +149,31 @@ public class UsageTest {
         Assert.assertNotNull("The auto published service 1 was null",autoPublishedService1);
         Assert.assertNotNull("The auto published service 2 was null",autoPublishedService2);
         Assert.assertEquals("The auto published service 1 method result was wrong","com.sample.osgi.bundle1.impl.AutoPublishedServiceImpl",autoPublishedService1.whoAmI());
-        Assert.assertEquals("The auto published service 1 method result was wrong","com.sample.osgi.bundle2.impl.AutoPublishedServiceImpl",autoPublishedService2.whoAmI());
+        Assert.assertEquals("The auto published service 2 method result was wrong","com.sample.osgi.bundle2.impl.AutoPublishedServiceImpl",autoPublishedService2.whoAmI());
+
+        ServiceReference[] manualPublishedServiceReferences = context.getServiceReferences(ManualPublishedService.class.getName(),null);
+        ManualPublishedService manualPublishedService1 = null;
+        ManualPublishedService manualPublishedService2 = null;
+        ManualPublishedService manualPublishedService3 = null;
+        Assert.assertNotNull("The manual published service reference array was null",manualPublishedServiceReferences);
+        Assert.assertEquals("The number of manual published service implementations was wrong",3,manualPublishedServiceReferences.length);
+        for(ServiceReference ref : manualPublishedServiceReferences) {
+            if(ref.getBundle() == bundle1) {
+                manualPublishedService1 = (ManualPublishedService)context.getService(ref);
+            }
+            if(ref.getBundle() == bundle2) {
+                manualPublishedService2 = (ManualPublishedService)context.getService(ref);
+            }
+            if(ref.getBundle() == bundle3) {
+                manualPublishedService3 = (ManualPublishedService)context.getService(ref);
+            }
+        }
+        Assert.assertNotNull("The manual published service 1 was null",manualPublishedService1);
+        Assert.assertNotNull("The manual published service 2 was null",manualPublishedService2);
+        Assert.assertNotNull("The manual published service 3 was null",manualPublishedService3);
+        Assert.assertEquals("The manual published service 1 method result was wrong","com.sample.osgi.bundle1.impl.ManualPublishedServiceImpl",manualPublishedService1.whoAmI());
+        Assert.assertEquals("The manual published service 2 method result was wrong","com.sample.osgi.bundle2.impl.ManualPublishedServiceImpl",manualPublishedService2.whoAmI());
+        Assert.assertEquals("The manual published service 3 method result was wrong","com.sample.osgi.bundle3.impl.ManualPublishedServiceImpl",manualPublishedService3.whoAmI());
 
     }
 }

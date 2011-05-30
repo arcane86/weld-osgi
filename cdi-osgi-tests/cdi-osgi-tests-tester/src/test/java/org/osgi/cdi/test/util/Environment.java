@@ -40,32 +40,38 @@ public class Environment {
         }
     }
 
+    public static String state(int state) {
+        String result = "";
+        switch (state) {
+            case Bundle.ACTIVE:
+                result = "ACTIVE";
+                break;
+            case Bundle.INSTALLED:
+                result = "INSTALLED";
+                break;
+            case Bundle.RESOLVED:
+                result = "RESOLVED";
+                break;
+            case Bundle.STARTING:
+                result = "STARTING";
+                break;
+            case Bundle.STOPPING:
+                result = "STOPPING";
+                break;
+            case Bundle.UNINSTALLED:
+                result = "UNINSTALLED";
+                break;
+            default:
+                result = "UNKNOWN";
+
+        }
+        return result;
+    }
+
     public static String state(BundleContext context) {
-        String result = "", state;
+        String result = "";
         for(Bundle b : context.getBundles()) {
-            switch(b.getState()) {
-                case Bundle.ACTIVE:
-                    state = "ACTIVE";
-                    break;
-                case Bundle.INSTALLED:
-                    state = "INSTALLED";
-                    break;
-                case Bundle.RESOLVED:
-                    state = "RESOLVED";
-                    break;
-                case Bundle.STARTING:
-                    state = "STARTING";
-                    break;
-                case Bundle.STOPPING:
-                    state = "STOPPING";
-                    break;
-                case Bundle.UNINSTALLED:
-                    state = "UNINSTALLED";
-                    break;
-                default:
-                    state = "UNKNOWN";
-            }
-            result += b.getSymbolicName() + "-" + b.getVersion() + ": " + state+System.getProperty("line.separator");
+            result += b.getSymbolicName() + "-" + b.getVersion() + ": " + state(b.getState()) +System.getProperty("line.separator");
         }
         return result;
     }
