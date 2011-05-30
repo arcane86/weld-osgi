@@ -16,6 +16,7 @@ import org.osgi.framework.*;
 import javax.enterprise.event.Event;
 import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.spi.BeanManager;
+import java.io.Serializable;
 import java.util.Collection;
 
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
@@ -119,6 +120,9 @@ public class UsageTest {
 
         Bundle bundle1 = null, bundle2 = null, bundle3 = null;
 
+        ServiceReference factoryReference = context.getServiceReference(CDIContainerFactory.class.getName());
+        CDIContainerFactory factory = (CDIContainerFactory) context.getService(factoryReference);
+
         for(Bundle b : context.getBundles()) {
             b.start();
             Assert.assertEquals("Bundle " + b.getSymbolicName() + " is not ACTIVE but " + Environment.state(b.getState()), Bundle.ACTIVE, b.getState());
@@ -174,6 +178,17 @@ public class UsageTest {
         Assert.assertEquals("The manual published service 1 method result was wrong","com.sample.osgi.bundle1.impl.ManualPublishedServiceImpl",manualPublishedService1.whoAmI());
         Assert.assertEquals("The manual published service 2 method result was wrong","com.sample.osgi.bundle2.impl.ManualPublishedServiceImpl",manualPublishedService2.whoAmI());
         Assert.assertEquals("The manual published service 3 method result was wrong","com.sample.osgi.bundle3.impl.ManualPublishedServiceImpl",manualPublishedService3.whoAmI());
+
+        ServiceReference[] blackListedServiceReferences = context.getServiceReferences(Serializable.class.getName(),null);
+        Assert.assertNotNull("The black list service reference array was null",blackListedServiceReferences);
+        Assert.assertEquals("The number of unblacklisted service implementations was wrong",1,blackListedServiceReferences.length);
+        Serializable unblackListedService = null;
+        for(ServiceReference ref : blackListedServiceReferences) {
+            if(ref.getBundle() == bundle1) {
+                unblackListedService = (Serializable)context.getService(ref);
+            }
+        }
+        Assert.assertNotNull("The unblacklisted published service was null",unblackListedService);
 
     }
 }
