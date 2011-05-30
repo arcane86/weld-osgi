@@ -1,9 +1,6 @@
 package org.osgi.cdi.test;
 
-import com.sample.osgi.bundle1.api.AutoPublishedService;
-import com.sample.osgi.bundle1.api.ContractInterface;
-import com.sample.osgi.bundle1.api.ManualPublishedService;
-import com.sample.osgi.bundle1.api.NotContractInterface;
+import com.sample.osgi.bundle1.api.*;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,10 +46,10 @@ public class UsageTest {
             if(b.getSymbolicName().equals("com.sample.osgi.cdi-osgi-tests-bundle1")) {
                 bundle1=b;
             }
-            if(b.getSymbolicName().equals("com.sample.osgi.cdi-osgi-tests-bundle2")) {
+            else if(b.getSymbolicName().equals("com.sample.osgi.cdi-osgi-tests-bundle2")) {
                 bundle2=b;
             }
-            if(b.getSymbolicName().equals("com.sample.osgi.cdi-osgi-tests-bundle3")) {
+            else if(b.getSymbolicName().equals("com.sample.osgi.cdi-osgi-tests-bundle3")) {
                 bundle3=b;
             }
         }
@@ -117,7 +114,7 @@ public class UsageTest {
     }
 
     @Test
-    public void serviceTest(BundleContext context) throws InterruptedException, InvalidSyntaxException, BundleException {
+    public void servicePublishingTest(BundleContext context) throws InterruptedException, InvalidSyntaxException, BundleException {
         Environment.waitForEnvironment(context);
 
         Bundle bundle1 = null, bundle2 = null, bundle3 = null;
@@ -131,10 +128,10 @@ public class UsageTest {
             if(b.getSymbolicName().equals("com.sample.osgi.cdi-osgi-tests-bundle1")) {
                 bundle1=b;
             }
-            if(b.getSymbolicName().equals("com.sample.osgi.cdi-osgi-tests-bundle2")) {
+            else if(b.getSymbolicName().equals("com.sample.osgi.cdi-osgi-tests-bundle2")) {
                 bundle2=b;
             }
-            if(b.getSymbolicName().equals("com.sample.osgi.cdi-osgi-tests-bundle3")) {
+            else if(b.getSymbolicName().equals("com.sample.osgi.cdi-osgi-tests-bundle3")) {
                 bundle3=b;
             }
         }
@@ -148,7 +145,7 @@ public class UsageTest {
             if(ref.getBundle() == bundle1) {
                 autoPublishedService1 = (AutoPublishedService)context.getService(ref);
             }
-            if(ref.getBundle() == bundle2) {
+            else if(ref.getBundle() == bundle2) {
                 autoPublishedService2 = (AutoPublishedService)context.getService(ref);
             }
         }
@@ -167,10 +164,10 @@ public class UsageTest {
             if(ref.getBundle() == bundle1) {
                 manualPublishedService1 = (ManualPublishedService)context.getService(ref);
             }
-            if(ref.getBundle() == bundle2) {
+            else if(ref.getBundle() == bundle2) {
                 manualPublishedService2 = (ManualPublishedService)context.getService(ref);
             }
-            if(ref.getBundle() == bundle3) {
+            else if(ref.getBundle() == bundle3) {
                 manualPublishedService3 = (ManualPublishedService)context.getService(ref);
             }
         }
@@ -192,7 +189,7 @@ public class UsageTest {
         }
         Assert.assertNotNull("The contract published service was null", contractPublishedService);
         ServiceReference[] notNontractPublishedServiceReferences = context.getServiceReferences(NotContractInterface.class.getName(),null);
-        Assert.assertNull("The not contract published service reference array was not null",notNontractPublishedServiceReferences);
+        Assert.assertNull("The not contract published service reference array was not null", notNontractPublishedServiceReferences);
 
         ServiceReference[] blackListedServiceReferences = context.getServiceReferences(Serializable.class.getName(),null);
         Assert.assertNotNull("The black list service reference array was null",blackListedServiceReferences);
@@ -205,5 +202,28 @@ public class UsageTest {
         }
         Assert.assertNotNull("The unblacklisted published service was null",unblackListedService);
 
+        ServiceReference[] propertyServiceReferences = context.getServiceReferences(PropertyService.class.getName(),null);
+        PropertyService propertyService1 = null;
+        PropertyService propertyService2 = null;
+        PropertyService propertyService3 = null;
+        Assert.assertNotNull("The property service reference array was null",propertyServiceReferences);
+        Assert.assertEquals("The number of property service implementations was wrong", 3,propertyServiceReferences.length);
+        for(ServiceReference ref : propertyServiceReferences) {
+            if(ref.getProperty("name") == null) {
+                propertyService1 = (PropertyService)context.getService(ref);
+            }
+            else if(ref.getProperty("name").equals("1")) {
+                propertyService2 = (PropertyService)context.getService(ref);
+            }
+            else if(ref.getProperty("name").equals("2")) {
+                propertyService3 = (PropertyService)context.getService(ref);
+            }
+        }
+        Assert.assertNotNull("The property service 1 was null",propertyService1);
+        Assert.assertNotNull("The property service 2 was null",propertyService2);
+        Assert.assertNotNull("The property service 3 was null",propertyService3);
+        Assert.assertEquals("The property service 1 method result was wrong","com.sample.osgi.bundle1.impl.PropertyServiceImpl1",propertyService1.whoAmI());
+        Assert.assertEquals("The property service 2 method result was wrong","com.sample.osgi.bundle1.impl.PropertyServiceImpl2",propertyService2.whoAmI());
+        Assert.assertEquals("The property service 3 method result was wrong","com.sample.osgi.bundle1.impl.PropertyServiceImpl3",propertyService3.whoAmI());
     }
 }
