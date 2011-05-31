@@ -1,24 +1,19 @@
 package org.osgi.cdi.impl.integration;
 
 import org.osgi.cdi.api.extension.annotation.Property;
+import org.osgi.cdi.api.extension.annotation.Publish;
 import org.osgi.cdi.impl.extension.CDIOSGiExtension;
 import org.osgi.cdi.impl.extension.services.RegistrationsHolderImpl;
-import org.osgi.cdi.api.extension.annotation.Publish;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceRegistration;
 
 import javax.enterprise.inject.Instance;
-import javax.enterprise.util.Nonbinding;
 import javax.inject.Qualifier;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 
@@ -53,12 +48,15 @@ public class ServicePublisher {
                 boolean instatiation = publishable;
                 Annotation[] annotations = null;
                 Object service = null;
+                InstanceHolder instanceHolder = instance.select(InstanceHolder.class).get();
                 if (instatiation) {
                     List<Annotation> qualifiers = getQualifiers(clazz);
                     try {
                         annotations = qualifiers.toArray(new Annotation[qualifiers.size()]);
-                        service = instance.select(clazz, annotations).get();
+                        service = instanceHolder.select(clazz, annotations).get();
+                        System.out.println(clazz + " " + qualifiers + " " + service.getClass());
                     } catch (Throwable e) {
+                        System.out.println("# " + clazz + " " + qualifiers);
                         e.printStackTrace();
                     }
                     if (publishable) {
@@ -109,20 +107,35 @@ public class ServicePublisher {
         Properties properties = null;
         if (!qualifiers.isEmpty()) {
             properties = new Properties();
+            Method m = null;
             for (Annotation qualif : qualifiers) {
-                for (Method m : qualif.annotationType().getDeclaredMethods()) {
-                    if (!m.isAnnotationPresent(Nonbinding.class)) {
-                        try {
-                            String key = qualif.annotationType().getName() + "." + m.getName();
-                            Object value = m.invoke(qualif);
-                            if (value == null) {
-                                value = m.getDefaultValue();
-                            }
-                            properties.setProperty(key, value.toString());
-                        } catch (Throwable t) {
-                            // ignore
-                        }
+//                for (Method m : qualif.annotationType().getDeclaredMethods()) {
+//                    if (!m.isAnnotationPresent(Nonbinding.class)) {
+//                        try {
+//                            String key = qualif.annotationType().getName() + "." + m.getName();
+//                            Object value = m.invoke(qualif);
+//                            if (value == null) {
+//                                value = m.getDefaultValue();
+//                            }
+//                            properties.setProperty(key, value.toString());
+//                        } catch (Throwable t) {
+//                            // ignore
+//                        }
+//                    }
+//                }
+                try {
+                    m = qualif.annotationType().getDeclaredMethod("value", null);
+                } catch (NoSuchMethodException e) {
+                    continue;
+                }
+                try {
+                    Object value = m.invoke(qualif);
+                    if (value == null) {
+                        value = m.getDefaultValue();
                     }
+                    properties.setProperty(qualif.annotationType().getSimpleName().toLowerCase(),value.toString());
+                } catch (Exception e) {
+                    continue;
                 }
             }
         }
@@ -169,8 +182,9 @@ public class ServicePublisher {
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             try {
                 CDIOSGiExtension.currentBundle.set(bundle.getBundleId());
+                InstanceHolder instanceHolder = instance.select(InstanceHolder.class).get();
                 return method.invoke(
-                        instance.select(contract, qualifiers).get(),
+                        instanceHolder.select(contract, qualifiers).get(),
                         args);
             } finally {
                 CDIOSGiExtension.currentBundle.remove();

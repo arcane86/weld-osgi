@@ -1,34 +1,19 @@
 package org.osgi.cdi.impl.extension;
 
-import org.osgi.cdi.impl.extension.services.BundleHolder;
-import org.osgi.cdi.impl.extension.services.ContainerObserver;
-import org.osgi.cdi.impl.extension.services.CDIOSGiProducer;
-import org.osgi.cdi.impl.extension.services.RegistrationsHolderImpl;
-import org.osgi.cdi.impl.extension.services.ServiceRegistryImpl;
 import org.osgi.cdi.api.extension.Service;
 import org.osgi.cdi.api.extension.annotation.Filter;
 import org.osgi.cdi.api.extension.annotation.OSGiService;
 import org.osgi.cdi.api.extension.annotation.Required;
+import org.osgi.cdi.impl.extension.services.*;
+import org.osgi.cdi.impl.integration.InstanceHolder;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
-import javax.enterprise.inject.spi.AfterBeanDiscovery;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.BeforeBeanDiscovery;
-import javax.enterprise.inject.spi.Extension;
-import javax.enterprise.inject.spi.InjectionPoint;
-import javax.enterprise.inject.spi.ProcessBean;
-import javax.enterprise.inject.spi.ProcessInjectionTarget;
-import javax.enterprise.inject.spi.ProcessObserverMethod;
+import javax.enterprise.inject.spi.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Weld OSGi extension.
@@ -60,6 +45,7 @@ public class CDIOSGiExtension implements Extension {
         event.addAnnotatedType(manager.createAnnotatedType(RegistrationsHolderImpl.class));
         event.addAnnotatedType(manager.createAnnotatedType(ServiceRegistryImpl.class));
         event.addAnnotatedType(manager.createAnnotatedType(ContainerObserver.class));
+        event.addAnnotatedType(manager.createAnnotatedType(InstanceHolder.class));
         event.addQualifier(OSGiService.class);
     }
     
